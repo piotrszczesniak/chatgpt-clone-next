@@ -1,0 +1,33 @@
+.main {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  color: white;
+  /* min-height: 100vh; */
+}
+
+.sidebar {
+  flex-basis: 30%;
+  background-color: #202123;
+  padding: 1rem;
+  height: 100vh;
+}
+
+.button {
+  border: 1px solid white;
+  background-color: transparent;
+  color: white;
+  padding: 0.5rem;
+  width: 100%;
+  text-align: left;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.content {
+  flex-basis: 70%;
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  height: 100vh;
+}
