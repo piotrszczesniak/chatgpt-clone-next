@@ -1,7 +1,20 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+type ResponseData = {};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const body = {
+    model: 'gpt-3.5-turbo',
+    messages: [
+      {
+        role: 'user',
+        content: req.body.message,
+      },
+    ],
+    max_tokens: 20,
+  };
+
   const requestOptions: RequestInit = {
     method: 'POST',
     headers: {
@@ -9,19 +22,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
 
-    body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [
-        {
-          role: 'user',
-          content: 'what can you do?',
-        },
-      ],
-      max_tokens: 100,
-    }),
+    body: JSON.stringify(body),
   };
 
   try {
+    // createChatCompletion
     const response = await fetch(`https://api.openai.com/v1/chat/completions`, requestOptions);
 
     const data = await response.json();

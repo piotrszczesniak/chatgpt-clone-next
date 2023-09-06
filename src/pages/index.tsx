@@ -5,12 +5,28 @@ import styles from '@/styles/Home.module.scss';
 
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
+import { ChangeEvent, useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
 // https://www.youtube.com/watch?v=uRQH2CFvedY
 
+type Message = {
+  role: 'user' | 'assistant' | null;
+  content: string;
+};
+
 export default function Home() {
+  const [value, setValue] = useState<string>('');
+  const [message, setMessage] = useState<Message>({
+    role: null,
+    content: '',
+  });
+
+  const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
   const getMessages = async () => {
     const requestOptions = {
       method: 'POST',
@@ -18,14 +34,14 @@ export default function Home() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: 'hello how are you',
+        message: value,
       }),
     };
 
     try {
       const resposne = await fetch(`http://localhost:3000/api/generate`, requestOptions);
       const data = await resposne.json();
-      console.log(data);
+      setMessage(data.choices[0].message);
     } catch (error) {
       console.error(error);
     }
@@ -50,8 +66,13 @@ export default function Home() {
           </nav>
         </section>
         <section className={styles.content}>
-          <h1>{`chatGPT`}</h1>
-          <Button onClick={getMessages}>Get messages</Button>
+          <h3>ChatGPT3.5 / ChatGPT4</h3>
+          <h1>{`ChatGPT`}</h1>
+
+          <p>{JSON.stringify(message?.content)}</p>
+
+          <input value={value} onChange={handleValueChange} />
+          <Button onClick={getMessages}>send</Button>
         </section>
       </main>
     </>
