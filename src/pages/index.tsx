@@ -3,11 +3,34 @@ import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import styles from '@/styles/Home.module.scss';
 
+import Button from '@mui/material/Button';
+import AddIcon from '@mui/icons-material/Add';
+
 const inter = Inter({ subsets: ['latin'] });
 
 // https://www.youtube.com/watch?v=uRQH2CFvedY
 
 export default function Home() {
+  const getMessages = async () => {
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: 'hello how are you',
+      }),
+    };
+
+    try {
+      const resposne = await fetch(`http://localhost:3000/api/generate`, requestOptions);
+      const data = await resposne.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -18,7 +41,9 @@ export default function Home() {
       </Head>
       <main className={`${styles.main}`}>
         <section className={styles.sidebar}>
-          <button className={styles.button}>+ new chat</button>
+          <Button className={styles.button} color='info' fullWidth variant='outlined' startIcon={<AddIcon />}>
+            new chat
+          </Button>
           <ul className='history'></ul>
           <nav>
             <p>Made by Piotr</p>
@@ -26,6 +51,7 @@ export default function Home() {
         </section>
         <section className={styles.content}>
           <h1>{`chatGPT`}</h1>
+          <Button onClick={getMessages}>Get messages</Button>
         </section>
       </main>
     </>
