@@ -5,7 +5,8 @@ import styles from '@/styles/Home.module.scss';
 
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
+import { Box, Container, Paper, TextField } from '@mui/material';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -13,35 +14,40 @@ const inter = Inter({ subsets: ['latin'] });
 
 type Message = {
   role: 'user' | 'assistant' | null;
-  content: string;
+  content: string | null;
 };
 
 export default function Home() {
   const [value, setValue] = useState<string>('');
-  const [message, setMessage] = useState<Message>({
-    role: null,
-    content: '',
-  });
+
+  const [messages, setMessages] = useState<Message[] | []>([]);
 
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
 
-  const getMessages = async () => {
+  const handleMessagesSend = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setMessages([...messages, { role: 'user', content: value }]);
+    fetchData();
+  };
+
+  const fetchData = async () => {
     const requestOptions = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: value,
+        messages: [...messages, { role: 'user', content: value }],
       }),
     };
 
     try {
       const resposne = await fetch(`http://localhost:3000/api/generate`, requestOptions);
       const data = await resposne.json();
-      setMessage(data.choices[0].message);
+      setMessages((currentMessages) => [...currentMessages, data.choices[0].message]);
+      setValue('');
     } catch (error) {
       console.error(error);
     }
@@ -60,19 +66,27 @@ export default function Home() {
           <Button className={styles.button} color='info' fullWidth variant='outlined' startIcon={<AddIcon />}>
             new chat
           </Button>
-          <ul className='history'></ul>
+
           <nav>
             <p>Made by Piotr</p>
           </nav>
         </section>
         <section className={styles.content}>
-          <h3>ChatGPT3.5 / ChatGPT4</h3>
-          <h1>{`ChatGPT`}</h1>
-
-          <p>{JSON.stringify(message?.content)}</p>
-
-          <input value={value} onChange={handleValueChange} />
-          <Button onClick={getMessages}>send</Button>
+          <Container>
+            {messages.map((message, index) => {
+              return (
+                <Box sx={{ bgcolor: '#cfe8fc', marginBottom: '0.5rem' }} key={index}>
+                  <Paper key={index} sx={{ padding: '0.5rem' }}>
+                    {message.role}: {message.content}
+                  </Paper>
+                </Box>
+              );
+            })}
+            <form onSubmit={handleMessagesSend}>
+              <TextField fullWidth value={value} onChange={handleValueChange} label='Ask me anything!' maxRows={4} />
+              <Button type='submit'>go</Button>
+            </form>
+          </Container>
         </section>
       </main>
     </>

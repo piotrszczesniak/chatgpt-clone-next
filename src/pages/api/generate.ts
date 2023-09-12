@@ -4,15 +4,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 type ResponseData = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  console.log('running...');
   const body = {
     model: 'gpt-3.5-turbo',
-    messages: [
-      {
-        role: 'user',
-        content: req.body.message,
-      },
-    ],
-    max_tokens: 20,
+    messages: [...req.body.messages],
+    max_tokens: 10,
   };
 
   const requestOptions: RequestInit = {
