@@ -6,7 +6,8 @@ import styles from '@/styles/Home.module.scss';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { Box, Container, Paper, TextField } from '@mui/material';
+import { Box, Container, Grid, Paper, TextField, styled } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,7 +30,33 @@ type Message = {
 export default function Home() {
   const [value, setValue] = useState<string>('');
 
-  const [messages, setMessages] = useState<Message[] | []>([]);
+  const [messages, setMessages] = useState<Message[] | []>([
+    {
+      role: 'user',
+      content:
+        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt perferendis veritatis, asperiores molestias aut vel accusantium quae unde eveniet quo, a eum? Consequatur veniam aut quasi amet quia dicta. Velit.',
+    },
+    {
+      role: 'assistant',
+      content:
+        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt perferendis veritatis, asperiores molestias aut vel accusantium quae unde eveniet quo, a eum? Consequatur veniam aut quasi amet quia dicta. Velit.',
+    },
+    {
+      role: 'user',
+      content:
+        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt perferendis veritatis, asperiores molestias aut vel accusantium quae unde eveniet quo, a eum? Consequatur veniam aut quasi amet quia dicta. Velit.',
+    },
+    {
+      role: 'assistant',
+      content:
+        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt perferendis veritatis, asperiores molestias aut vel accusantium quae unde eveniet quo, a eum? Consequatur veniam aut quasi amet quia dicta. Velit.',
+    },
+    {
+      role: 'user',
+      content:
+        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt perferendis veritatis, asperiores molestias aut vel accusantium quae unde eveniet quo, a eum? Consequatur veniam aut quasi amet quia dicta. Velit.',
+    },
+  ]);
 
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -70,33 +97,69 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <main className={`${styles.main}`}>
-        <section className={styles.sidebar}>
-          <Button className={styles.button} color='info' fullWidth variant='outlined' startIcon={<AddIcon />}>
-            new chat
-          </Button>
+      <main>
+        <Box sx={{ flexGrow: 1, height: '100vh' }}>
+          <Grid container sx={{ height: '100%' }} spacing={2}>
+            <Grid item xs={4}>
+              <Button className={styles.button} color='info' fullWidth variant='outlined' startIcon={<AddIcon />}>
+                new chat
+              </Button>
 
-          <nav>
-            <p>Made by Piotr</p>
-          </nav>
-        </section>
-        <section className={styles.content}>
-          <Container>
-            {messages.map((message, index) => {
-              return (
-                <Box sx={{ bgcolor: '#cfe8fc', marginBottom: '0.5rem' }} key={index}>
-                  <Paper key={index} sx={{ padding: '0.5rem' }}>
-                    {message.role}: {message.content}
-                  </Paper>
-                </Box>
-              );
-            })}
-            <form onSubmit={handleMessagesSend}>
-              <TextField fullWidth value={value} onChange={handleValueChange} label='Ask me anything!' maxRows={4} />
-              <Button type='submit'>go</Button>
-            </form>
-          </Container>
-        </section>
+              <nav>chat history</nav>
+            </Grid>
+            <Grid item xs={8}>
+              {messages.map((message, index) => {
+                return (
+                  <Box sx={{ bgcolor: '#cfe8fc', marginBottom: '1rem' }} key={index}>
+                    {message.role === 'user' && (
+                      <Paper key={index} elevation={4} sx={{ padding: '0.5rem', position: 'relative' }}>
+                        <Image
+                          src={'/user.webp'}
+                          alt={''}
+                          width={48}
+                          height={48}
+                          style={{
+                            borderRadius: '50%',
+                            position: 'absolute',
+                            top: '0',
+                            left: '-56px',
+                          }}
+                        />
+
+                        {message.content}
+                      </Paper>
+                    )}
+                    {message.role === 'assistant' && (
+                      <Paper key={index} elevation={4} sx={{ padding: '0.5rem', position: 'relative' }}>
+                        <Image
+                          src={'/assistant.svg'}
+                          alt={''}
+                          width={48}
+                          height={48}
+                          style={{
+                            borderRadius: '50%',
+                            position: 'absolute',
+                            top: '0',
+                            left: '-56px',
+                            backgroundColor: '#19c37d',
+                            padding: '8px',
+                          }}
+                        />
+                        {message.content}
+                      </Paper>
+                    )}
+                  </Box>
+                );
+              })}
+              <form onSubmit={handleMessagesSend}>
+                <TextField value={value} placeholder='Send message' onChange={handleValueChange} multiline maxRows={4} />
+                <Button size='large' type='submit'>
+                  <SendIcon />
+                </Button>
+              </form>
+            </Grid>
+          </Grid>
+        </Box>
       </main>
     </>
   );
