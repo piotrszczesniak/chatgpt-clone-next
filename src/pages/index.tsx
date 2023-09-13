@@ -17,6 +17,15 @@ type Message = {
   content: string | null;
 };
 
+// PRAGMA foreign_keys = ON;
+
+// TODO:
+//  * sqlite3 // npm
+//  * mysql: insert, select (where from), delete
+//  * front <---> backend <---> baza
+//  * https://sqlitebrowser.org/
+//  * sqlite3 orm node
+
 export default function Home() {
   const [value, setValue] = useState<string>('');
 
