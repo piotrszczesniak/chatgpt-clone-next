@@ -32,6 +32,15 @@ export default function Home() {
       role: 'user',
       content: `Hi! I'm Piotr. I'm a junior/mid frontend developer in React/Next. I live in Krakow, Poland. Please provide each response in markdown.`,
     },
+    {
+      role: 'user',
+      content: 'create a 3 tasks to do list after you wake up',
+    },
+
+    {
+      role: 'assistant',
+      content: `## Tasks to Do List After Waking Up 1. **Morning Stretching:** Start your day with some gentle stretching exercises to awaken your body and improve flexibility. Spend 10-15 minutes performing stretches targeting major muscle groups. 2. **Hydrate:** After a long night's sleep, it's important to hydrate your body. Drink a glass of water or enjoy a cup of herbal tea to replenish lost fluids and kickstart your metabolism. 3. **Plan Your Day:** Take a few minutes to plan your day ahead. Write down your priorities, set goals, and make a to-do list. This will help you stay organized and focused throughout the day. Remember, starting your day with these simple tasks can help you feel refreshed, energized, and ready to tackle whatever lies ahead.`,
+    },
   ]);
 
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
