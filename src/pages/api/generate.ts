@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const body = {
     model: 'gpt-3.5-turbo',
     messages: [...req.body.messages],
-    max_tokens: 10,
+    max_tokens: 1000,
   };
 
   const requestOptions: RequestInit = {

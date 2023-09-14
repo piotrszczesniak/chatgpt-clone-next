@@ -12,7 +12,6 @@ const Message = ({ message }: MessageProps) => {
       sx={{
         display: 'flex',
         gap: '0.5rem',
-        backgroundColor: 'white',
         justifyContent: message.role === 'user' ? 'flex-start' : 'flex-end',
       }}
     >
