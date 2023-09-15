@@ -1,6 +1,8 @@
 import { MessageType } from '@/utilis/types';
 import { Box, Paper } from '@mui/material';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type MessageProps = {
   message: MessageType;
@@ -9,6 +11,7 @@ type MessageProps = {
 const Message = ({ message }: MessageProps) => {
   return (
     <Box
+      className="message"
       sx={{
         display: 'flex',
         gap: '0.5rem',
@@ -24,11 +27,13 @@ const Message = ({ message }: MessageProps) => {
           order: message.role === 'user' ? '0' : '1',
           color: 'white',
           borderRadius: '50%',
-          backgroundColor: message.role === 'user' ? 'white' : '#19c37d',
+          backgroundColor: message.role === 'user' ? 'white' : 'white',
         }}
       />
       <Paper elevation={4} sx={{ padding: '0.5rem', position: 'relative' }}>
-        {message.content}
+        <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>
+          {message.content || ''}
+        </ReactMarkdown>
       </Paper>
     </Box>
   );
