@@ -15,6 +15,7 @@ const Message = ({ message }: MessageProps) => {
       sx={{
         display: 'flex',
         gap: '0.5rem',
+
         justifyContent: message.role === 'user' ? 'flex-start' : 'flex-end',
       }}
     >
@@ -30,7 +31,14 @@ const Message = ({ message }: MessageProps) => {
           backgroundColor: message.role === 'user' ? 'white' : 'white',
         }}
       />
-      <Paper elevation={4} sx={{ padding: '0.5rem', position: 'relative' }}>
+      <Paper
+        elevation={4}
+        sx={{
+          padding: '0.5rem',
+          position: 'relative',
+          boxShadow: '0 0 10px 5px #444c56',
+        }}
+      >
         <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>
           {message.content || ''}
         </ReactMarkdown>

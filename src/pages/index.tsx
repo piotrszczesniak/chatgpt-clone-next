@@ -77,12 +77,13 @@ export default function Home() {
       </Head>
 
       <Box sx={{ flexGrow: 1, height: '100vh' }}>
-        <Grid container sx={{ height: '100%' }} spacing={4}>
+        <Grid container sx={{ height: '100%' }}>
           <Grid
             className="sidebar"
             item
             xs={3}
             sx={{
+              padding: '1rem',
               backgroundColor: '#444c56',
             }}
           >
@@ -103,6 +104,7 @@ export default function Home() {
             item
             xs={9}
             sx={{
+              padding: '1rem',
               backgroundColor: '#2d333b',
               display: 'flex',
               flexDirection: 'column',
