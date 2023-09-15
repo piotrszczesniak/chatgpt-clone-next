@@ -3,12 +3,16 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 type ResponseData = {};
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   console.log('running...');
   const body = {
     model: 'gpt-3.5-turbo',
     messages: [...req.body.messages],
-    max_tokens: 1000,
+    max_tokens: 100,
+    format: 'markdown',
   };
 
   const requestOptions: RequestInit = {
@@ -23,7 +27,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // createChatCompletion
-    const response = await fetch(`https://api.openai.com/v1/chat/completions`, requestOptions);
+    const response = await fetch(
+      `https://api.openai.com/v1/chat/completions`,
+      requestOptions
+    );
 
     const data = await response.json();
 
