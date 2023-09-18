@@ -3,9 +3,17 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 const sqlite3 = require('sqlite3').verbose();
 let sql;
 
-const db = new sqlite3.Database('./chat-gpt.db', sqlite3.OPEN_READWRITE, (error: any) => {
-  if (error) return console.log(error.message);
+const db = new sqlite3.Database('./db/chat-gpt.db', sqlite3.OPEN_READWRITE, (error: Error | null) => {
+  if (error) return console.error(error.message);
 });
+
+// sql = `INSERT INTO chatgpt_messages(date, question, answer,id_chat) VALUES (?,?,?,?)`;
+
+db.run('DROP TABLE chatgpt_messages');
+
+// db.run(sql, ['today', 'How are you?', 'I am fine.', 2], (error: Error | null) => {
+//   if (error) return console.error(error.message);
+// });
 
 // https://www.youtube.com/watch?v=ZRYn6tgnEgM
 
