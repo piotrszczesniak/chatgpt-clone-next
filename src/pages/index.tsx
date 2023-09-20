@@ -71,6 +71,7 @@ export default function Home() {
 
   console.log('chat: ', chat);
   console.log('messages: ', messages);
+  console.log('history: ', history);
 
   const fetchData = async () => {
     const requestOptions = {
@@ -107,26 +108,26 @@ export default function Home() {
 
   // get history from the database on initial render
   // store it inside history state
-  // const fetchHistory = async () => {
-  //   const requestOptions = {
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //   };
+  const fetchHistory = async () => {
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
 
-  //   try {
-  //     const response = await fetch('http://localhost:3000/api/generate', requestOptions);
-  //     const data = await response.json();
-  //     setHistory(data);
-  //   } catch (error: unknown) {
-  //     console.error(error);
-  //   }
-  // };
+    try {
+      const response = await fetch('http://localhost:3000/api/history', requestOptions);
+      const data = await response.json();
+      setHistory(data);
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
 
-  // useEffect(() => {
-  //   fetchHistory();
-  // }, []);
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
   return (
     <>
