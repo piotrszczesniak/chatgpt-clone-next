@@ -31,7 +31,8 @@ export default function Home() {
 
   const [chat, setChat] = useState<ChatType | null>(null);
 
-  const [history, setHistory] = useState<HistoryType | null>(null);
+  // state for pass chats - get from db
+  const [history, setHistory] = useState<[]>([]);
 
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -39,22 +40,37 @@ export default function Home() {
 
   const handleMessagesSend = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (chat) {
-      setMessages([...messages, { role: 'user', content: value }]);
-      setChat({ id: chat.id, conversation: [...messages, { role: 'user', content: value }] });
-      fetchData();
-    } else {
-    }
+
+    setMessages([...messages, { role: 'user', content: value }]);
+
+    fetchData();
   };
 
   const handleNewChat = () => {
-    if (chat) {
-      //
-    }
+    // ! there should be API call to db to get chat_id
 
-    setChat({ id: Math.floor(Math.random() * 1000), conversation: [] });
-    setMessages([]);
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id: null }),
+    };
+    const fetchChatId = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/generate', requestOptions);
+        const data = await response.json();
+        setChat({ id: data.id, conversation: messages });
+        console.log('chat id:', data.id);
+      } catch (error: unknown) {
+        console.error(error);
+      }
+    };
+    fetchChatId();
   };
+
+  console.log('chat: ', chat);
+  console.log('messages: ', messages);
 
   const fetchData = async () => {
     const requestOptions = {
@@ -79,14 +95,38 @@ export default function Home() {
     }
   };
 
+  // when messages gets updated, also chat gets updated
   useEffect(() => {
-    // ! what if i change setChat after messages change?
-    if (chat?.id) {
-      setChat({ id: chat?.id, conversation: [...messages] });
-    }
-  }, [messages, chat?.id]);
+    setChat((prevChat) => {
+      if (prevChat) {
+        return { id: prevChat.id, conversation: messages };
+      }
+      return null;
+    });
+  }, [messages]);
 
-  console.log(`chats:`, chat);
+  // get history from the database on initial render
+  // store it inside history state
+  // const fetchHistory = async () => {
+  //   const requestOptions = {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //   };
+
+  //   try {
+  //     const response = await fetch('http://localhost:3000/api/generate', requestOptions);
+  //     const data = await response.json();
+  //     setHistory(data);
+  //   } catch (error: unknown) {
+  //     console.error(error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchHistory();
+  // }, []);
 
   return (
     <>

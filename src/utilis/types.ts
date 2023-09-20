@@ -4,8 +4,8 @@ export type MessageType = {
 };
 
 export type ChatType = {
-  id: number;
-  conversation: MessageType[];
+  id: number | null;
+  conversation: MessageType[] | null;
 };
 
 export type HistoryType = {
