@@ -31,7 +31,6 @@ export default function Home() {
 
   const [chat, setChat] = useState<ChatType | null>(null);
 
-  // state for pass chats - get from db
   const [history, setHistory] = useState<[]>([]);
 
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -47,21 +46,18 @@ export default function Home() {
   };
 
   const handleNewChat = () => {
-    // ! there should be API call to db to get chat_id
-
     const requestOptions = {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ id: null }),
     };
     const fetchChatId = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/generate', requestOptions);
+        const response = await fetch('http://localhost:3000/api/new-chat', requestOptions);
         const data = await response.json();
-        setChat({ id: data.id, conversation: messages });
-        console.log('chat id:', data.id);
+
+        console.log('chat id:', data);
       } catch (error: unknown) {
         console.error(error);
       }
@@ -106,8 +102,6 @@ export default function Home() {
     });
   }, [messages]);
 
-  // get history from the database on initial render
-  // store it inside history state
   const fetchHistory = async () => {
     const requestOptions = {
       method: 'GET',
