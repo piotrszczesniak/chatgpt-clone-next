@@ -6,7 +6,9 @@ const sql = `INSERT INTO chatgpt_chats(date) VALUES (?)`;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    db.run(sql, [new Date()], function (this: RunResult, error: Error | null) {
+    const timestamp = new Date();
+    console.log('----timestamp----', typeof timestamp);
+    db.run(sql, [timestamp.toString()], function (this: RunResult, error: Error | null) {
       if (error) {
         res.status(500).json({ error });
       } else {

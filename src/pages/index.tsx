@@ -147,7 +147,20 @@ export default function Home() {
               new chat
             </Button>
 
-            <nav>chat history</nav>
+            {history.length === 0 ? (
+              <div>
+                <p>No previouse chats</p>
+              </div>
+            ) : (
+              history.map((item: { id: number; date: string }, index: number) => {
+                const date = new Date(item.date);
+                return (
+                  <p key={index}>
+                    {item?.id} | {date.toLocaleString()}
+                  </p>
+                );
+              })
+            )}
           </Grid>
           <Grid
             className='content'
