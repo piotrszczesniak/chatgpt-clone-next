@@ -65,6 +65,27 @@ export default function Home() {
     fetchChatId();
   };
 
+  const handleShowSingleChat = () => {
+    // TODO
+    // * clicking on a single chat from history shows single chat thread
+    // * so it should get chat id, and use it to request all messages inside this chat
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    const fetchSingleChat = async () => {
+      try {
+      } catch (error: unknown) {
+        console.log(error);
+      }
+    };
+
+    fetchSingleChat();
+  };
+
   console.log('chat: ', chat);
   console.log('messages: ', messages);
   console.log('history: ', history);
@@ -155,7 +176,7 @@ export default function Home() {
               history.map((item: { id: number; date: string }, index: number) => {
                 const date = new Date(item.date);
                 return (
-                  <p key={index}>
+                  <p key={index} onClick={handleShowSingleChat}>
                     {item?.id} | {date.toLocaleString()}
                   </p>
                 );
