@@ -26,71 +26,25 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const [value, setValue] = useState<string>('');
-
   const [messages, setMessages] = useState<MessageType[] | []>([]);
-
   const [chat, setChat] = useState<ChatType | null>(null);
-
   const [history, setHistory] = useState<[]>([]);
 
+  const [singleChat, setSingleChat] = useState([]);
+
+  // input changes
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
 
-  const handleMessagesSend = (e: FormEvent<HTMLFormElement>) => {
+  // request to /api/generate/
+  const handleSendMessages = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     setMessages([...messages, { role: 'user', content: value }]);
-
-    fetchData();
+    sendMessages();
   };
 
-  const handleNewChat = () => {
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    const fetchChatId = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/new-chat', requestOptions);
-        const data = await response.json();
-
-        console.log('chat id:', data);
-      } catch (error: unknown) {
-        console.error(error);
-      }
-    };
-    fetchChatId();
-  };
-
-  const handleShowSingleChat = () => {
-    // TODO
-    // * clicking on a single chat from history shows single chat thread
-    // * so it should get chat id, and use it to request all messages inside this chat
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    const fetchSingleChat = async () => {
-      try {
-      } catch (error: unknown) {
-        console.log(error);
-      }
-    };
-
-    fetchSingleChat();
-  };
-
-  console.log('chat: ', chat);
-  console.log('messages: ', messages);
-  console.log('history: ', history);
-
-  const fetchData = async () => {
+  const sendMessages = async () => {
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -102,16 +56,112 @@ export default function Home() {
     };
 
     try {
-      const response = await fetch(`http://localhost:3000/api/generate`, requestOptions);
+      const response = await fetch(
+        `http://localhost:3000/api/generate`,
+        requestOptions
+      );
       const data = await response.json();
       // console.log(data);
-      setMessages((currentMessages) => [...currentMessages, data.choices[0].message]);
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        data.choices[0].message,
+      ]);
 
       setValue('');
     } catch (error) {
       console.error(error);
     }
   };
+
+  // request to /api/new-chat
+  const handleNewChat = () => {
+    startNewChat();
+  };
+
+  const startNewChat = async () => {
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    try {
+      const response = await fetch(
+        'http://localhost:3000/api/new-chat',
+        requestOptions
+      );
+      const data = await response.json();
+
+      console.log('chat id:', data);
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
+
+  // request to /api/chat
+  const handleShowSingleChat = (id: number) => {
+    // TODO
+    // * clicking on a single chat from history shows single chat thread
+    // * so it should get chat id, and use it to request all messages inside this chat
+
+    getSingleChat(id);
+  };
+
+  const getSingleChat = async (id: number) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ chatId: id }),
+    };
+    try {
+      const response = await fetch(
+        'http://localhost:3000/api/chat',
+        requestOptions
+      );
+      const data = await response.json();
+      console.log('single chat-----', data);
+
+      setSingleChat(data);
+      // now map data to messages format
+
+      // setMessages[
+      //   {role: 'user', content: '...'},
+      //   {role: 'assistant', content: '...'},
+      //   {role: 'user', content: '...'},
+      //   {role: 'assistant', content: '...'},
+      // ]
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
+  const getChatHistory = async () => {
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    try {
+      const response = await fetch(
+        'http://localhost:3000/api/history',
+        requestOptions
+      );
+      const data = await response.json();
+      setHistory(data);
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
+
+  // ! Console Logs
+  console.log('chat: ', chat);
+  console.log('messages: ', messages);
+  console.log('history: ', history);
 
   // when messages gets updated, also chat gets updated
   useEffect(() => {
@@ -123,40 +173,23 @@ export default function Home() {
     });
   }, [messages]);
 
-  const fetchHistory = async () => {
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    try {
-      const response = await fetch('http://localhost:3000/api/history', requestOptions);
-      const data = await response.json();
-      setHistory(data);
-    } catch (error: unknown) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    fetchHistory();
+    getChatHistory();
   }, []);
 
   return (
     <>
       <Head>
         <title>Create Next App</title>
-        <meta name='description' content='Generated by create next app' />
-        <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <link rel='icon' href='/favicon.ico' />
+        <meta name="description" content="Generated by create next app" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <Box sx={{ flexGrow: 1, height: '100vh' }}>
         <Grid container sx={{ height: '100%' }}>
           <Grid
-            className='sidebar'
+            className="sidebar"
             item
             xs={3}
             sx={{
@@ -164,7 +197,17 @@ export default function Home() {
               backgroundColor: '#444c56',
             }}
           >
-            <Button onClick={handleNewChat} className={styles.button} color='info' fullWidth variant='outlined' startIcon={<AddIcon />}>
+            <Button
+              sx={{
+                marginBottom: '0.5rem',
+              }}
+              onClick={handleNewChat}
+              className={styles.button}
+              color="info"
+              fullWidth
+              variant="outlined"
+              startIcon={<AddIcon />}
+            >
               new chat
             </Button>
 
@@ -173,18 +216,31 @@ export default function Home() {
                 <p>No previouse chats</p>
               </div>
             ) : (
-              history.map((item: { id: number; date: string }, index: number) => {
-                const date = new Date(item.date);
-                return (
-                  <p key={index} onClick={handleShowSingleChat}>
-                    {item?.id} | {date.toLocaleString()}
-                  </p>
-                );
-              })
+              history.map(
+                (item: { id: number; date: string }, index: number) => {
+                  const date = new Date(item.date);
+                  return (
+                    <Button
+                      key={index}
+                      sx={{
+                        marginBottom: '0.5rem',
+                      }}
+                      onClick={() => handleShowSingleChat(item?.id)}
+                      className={styles.button}
+                      color="info"
+                      fullWidth
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                    >
+                      {item?.id} | {date.toLocaleString()}
+                    </Button>
+                  );
+                }
+              )
             )}
           </Grid>
           <Grid
-            className='content'
+            className="content"
             item
             xs={9}
             sx={{
@@ -198,7 +254,7 @@ export default function Home() {
             }}
           >
             <Container
-              maxWidth='md'
+              maxWidth="md"
               sx={{
                 height: '90%',
                 overflowY: 'scroll',
@@ -214,21 +270,25 @@ export default function Home() {
               }}
               style={{}}
             >
-              <Box className='messages' sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {JSON.stringify(singleChat)}
+              <Box
+                className="messages"
+                sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+              >
                 {messages.map((message, index) => (
                   <Message message={message} key={index} />
                 ))}
               </Box>
             </Container>
             <Container
-              maxWidth='md'
+              maxWidth="md"
               sx={{
                 height: '10%',
               }}
             >
               <Box>
                 <form
-                  onSubmit={handleMessagesSend}
+                  onSubmit={handleSendMessages}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -239,10 +299,10 @@ export default function Home() {
                 >
                   <TextField
                     value={value}
-                    placeholder='Type a new message'
+                    placeholder="Type a new message"
                     onChange={handleValueChange}
                     fullWidth
-                    variant='outlined'
+                    variant="outlined"
                     sx={{
                       input: {
                         color: 'white',
@@ -251,9 +311,9 @@ export default function Home() {
                     }}
                   />
                   <Button
-                    variant='outlined'
-                    size='large'
-                    type='submit'
+                    variant="outlined"
+                    size="large"
+                    type="submit"
                     endIcon={<SendIcon sx={{ padding: '0', margin: '0' }} />}
                     sx={{
                       height: '100%',
