@@ -1,13 +1,13 @@
-export type MessageType = {
+export type SingleMessageType = {
   role: 'user' | 'assistant' | null;
   content: string | null;
 };
 
-export type ChatType = {
+export type SingleChatType = {
   id: number | null;
-  conversation: MessageType[] | null;
+  conversation: SingleMessageType[] | null;
 };
 
 export type HistoryType = {
-  records: ChatType[];
+  records: SingleChatType[];
 };

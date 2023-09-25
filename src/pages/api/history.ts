@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import db from '@/utilis/db';
 
-const sql = `SELECT * FROM chatgpt_chats`;
-
 // db.run('DROP TABLE chatgpt_messages');
 // db.run('TRUNCATE TABLE chatgpt_messages');
 
@@ -20,6 +18,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   console.log('history endpoint gets hit');
+  const sql = `SELECT * FROM chatgpt_chats`;
 
   try {
     db.all(sql, [], (error: Error | null, rows: unknown) => {

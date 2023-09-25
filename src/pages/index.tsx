@@ -5,11 +5,12 @@ import styles from '@/styles/Home.module.scss';
 
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
+import ChatIcon from '@mui/icons-material/Chat';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Box, Container, Grid, Paper, TextField, styled } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Message from '@/components/Message';
-import { ChatType, HistoryType, MessageType } from '@/utilis/types';
+import { SingleChatType, HistoryType, SingleMessageType } from '@/utilis/types';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -26,8 +27,8 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const [value, setValue] = useState<string>('');
-  const [messages, setMessages] = useState<MessageType[] | []>([]);
-  const [chat, setChat] = useState<ChatType | null>(null);
+  const [messages, setMessages] = useState<SingleMessageType[] | []>([]);
+  const [chat, setChat] = useState<SingleChatType | null>(null);
   const [history, setHistory] = useState<[]>([]);
 
   const [singleChat, setSingleChat] = useState([]);
@@ -122,17 +123,14 @@ export default function Home() {
         requestOptions
       );
       const data = await response.json();
-      console.log('single chat-----', data);
 
-      setSingleChat(data);
       // now map data to messages format
 
-      // setMessages[
-      //   {role: 'user', content: '...'},
-      //   {role: 'assistant', content: '...'},
-      //   {role: 'user', content: '...'},
-      //   {role: 'assistant', content: '...'},
-      // ]
+      const mappedData = data.map((item: any /* temporaty type */) => [
+        { role: 'user', content: item?.question },
+        { role: 'assistant', content: item?.answer },
+      ]);
+      setMessages((prev) => [...prev, mappedData.flat()]);
     } catch (error: unknown) {
       console.log(error);
     }
@@ -159,9 +157,11 @@ export default function Home() {
   };
 
   // ! Console Logs
-  console.log('chat: ', chat);
-  console.log('messages: ', messages);
-  console.log('history: ', history);
+  // console.log('chat: ', chat);
+  // console.log('messages: ', messages);
+  // console.log('history: ', history);
+
+  // map db msg to chat msg
 
   // when messages gets updated, also chat gets updated
   useEffect(() => {
@@ -230,9 +230,9 @@ export default function Home() {
                       color="info"
                       fullWidth
                       variant="outlined"
-                      startIcon={<AddIcon />}
+                      startIcon={<ChatIcon />}
                     >
-                      {item?.id} | {date.toLocaleString()}
+                      Chat from {date.toLocaleDateString()}
                     </Button>
                   );
                 }
