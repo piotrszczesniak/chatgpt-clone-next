@@ -6,6 +6,7 @@ import styles from '@/styles/Home.module.scss';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import ChatIcon from '@mui/icons-material/Chat';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Box, Container, Grid, Paper, TextField, styled } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -93,11 +94,30 @@ export default function Home() {
     }
   };
 
+  const handleDeleteSingleChat = (id: number) => {
+    deleteSingleChat(id);
+  };
+
+  const deleteSingleChat = async (id: number) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ chatId: id }),
+    };
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/delete-chat`, requestOptions);
+      const data = await response.json();
+      getChatHistory();
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
+
   // request to /api/chat
   const handleShowSingleChat = (id: number) => {
-    // TODO
-    // * clicking on a single chat from history shows single chat thread
-    // * so it should get chat id, and use it to request all messages inside this chat
     setCurrentChatId(id);
     getSingleChat(id);
   };
@@ -121,7 +141,7 @@ export default function Home() {
 
       setChat({ id, conversation: mappedData.flat() });
     } catch (error: unknown) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -143,8 +163,6 @@ export default function Home() {
   };
 
   // ! Console Logs
-
-  // map db msg to chat msg
 
   // when messages gets updated, also chat gets updated
   useEffect(() => {
@@ -208,6 +226,7 @@ export default function Home() {
                     key={index}
                     sx={{
                       marginBottom: '0.5rem',
+                      position: 'relative',
                     }}
                     onClick={() => handleShowSingleChat(item?.id)}
                     className={styles.button}
@@ -215,8 +234,20 @@ export default function Home() {
                     fullWidth
                     variant='outlined'
                     startIcon={<ChatIcon />}
+                    // endIcon={}
                   >
                     Chat from {date.toLocaleDateString()}
+                    <DeleteOutlineIcon
+                      onClick={(e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+                        e.stopPropagation();
+                        handleDeleteSingleChat(item?.id);
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        right: 0,
+                        zIndex: 1,
+                      }}
+                    />
                   </Button>
                 );
               })
