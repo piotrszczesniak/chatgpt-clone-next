@@ -1,17 +1,17 @@
-import { MessageType } from '@/utilis/types';
+import { SingleMessageType } from '@/utilis/types';
 import { Box, Paper } from '@mui/material';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 type MessageProps = {
-  message: MessageType;
+  message: SingleMessageType;
 };
 
 const Message = ({ message }: MessageProps) => {
   return (
     <Box
-      className="message"
+      className='message'
       sx={{
         display: 'flex',
         gap: '0.5rem',
@@ -39,9 +39,7 @@ const Message = ({ message }: MessageProps) => {
           boxShadow: '0 0 10px 5px #444c56',
         }}
       >
-        <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>
-          {message.content || ''}
-        </ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>{message.content || ''}</ReactMarkdown>
       </Paper>
     </Box>
   );
