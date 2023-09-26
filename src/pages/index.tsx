@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import ChatIcon from '@mui/icons-material/Chat';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { Box, Container, Grid, Paper, TextField, styled } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Message from '@/components/Message';
@@ -34,6 +34,7 @@ export default function Home() {
   const [chat, setChat] = useState<SingleChatType | null>(null);
   const [history, setHistory] = useState<[]>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // input changes
   const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -70,11 +71,15 @@ export default function Home() {
     }
   };
 
-  // request to /api/new-chat
   const handleNewChat = () => {
-    startNewChat();
+    setChat({ id: null, conversation: [] });
+    setCurrentChatId(null);
+    inputRef?.current?.focus();
+
+    // startNewChat();
   };
 
+  // request to /api/new-chat
   const startNewChat = async () => {
     const requestOptions = {
       method: 'GET',
@@ -176,6 +181,7 @@ export default function Home() {
 
   useEffect(() => {
     getChatHistory();
+    inputRef?.current?.focus();
   }, []);
 
   return (
@@ -244,7 +250,7 @@ export default function Home() {
                       }}
                       sx={{
                         position: 'absolute',
-                        right: 0,
+                        right: '8px',
                         zIndex: 1,
                       }}
                     />
@@ -272,7 +278,6 @@ export default function Home() {
               sx={{
                 height: '90%',
                 overflowY: 'scroll',
-
                 scrollbarWidth: 'thin', // For Firefox
                 '&::-webkit-scrollbar': {
                   width: '0.5rem',
@@ -289,8 +294,6 @@ export default function Home() {
                 {chat?.conversation?.map((message, index) => {
                   return <Message message={message} key={index} />;
                 })}
-
-                {chat?.conversation?.length === 0 && 'Ask me anything!'}
               </Box>
             </Container>
             <Container
@@ -316,6 +319,7 @@ export default function Home() {
                     onChange={handleValueChange}
                     fullWidth
                     variant='outlined'
+                    inputRef={inputRef}
                     sx={{
                       input: {
                         color: 'white',
