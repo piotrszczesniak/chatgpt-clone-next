@@ -13,6 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(500).json({ error: 'Internal Server Error' });
       } else {
         const data = rows;
+        console.log('data from the database ----', data);
         res.status(200).json(data);
       }
     });

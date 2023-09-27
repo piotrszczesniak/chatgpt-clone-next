@@ -28,9 +28,6 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function Home() {
   const [inputValue, setInputValue] = useState<string>('');
-
-  // not sure if messages are necessary - i guess no
-
   const [messages, setMessages] = useState<SingleMessageType[] | []>([]);
   const [chatHistory, setChatHistory] = useState<[]>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
@@ -58,6 +55,7 @@ export default function Home() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        id: currentChatId,
         messages: [...messages, { role: 'user', content: inputValue }],
       }),
     };
@@ -142,7 +140,7 @@ export default function Home() {
     try {
       const response = await fetch('http://localhost:3000/api/chat', requestOptions);
       const data = await response.json();
-
+      console.table(data);
       const mappedData = data.map((item: any /* temporaty type */) => [
         { role: 'user', content: item?.question },
         { role: 'assistant', content: item?.answer },
@@ -172,6 +170,15 @@ export default function Home() {
   }
 
   // ! Console Logs
+  console.log(currentChatId);
+
+  // ! only new messages should be save in data base
+
+  useEffect(() => {
+    if (currentChatId && messages) {
+      console.log('it is time to save data in db');
+    }
+  }, [messages, currentChatId]);
 
   useEffect(() => {
     getChatHistory();
