@@ -5,6 +5,7 @@ import { RunResult } from 'sqlite3';
 const sql = `INSERT INTO chatgpt_chats(date) VALUES (?)`;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  console.log('new chat endpoint gets hit');
   try {
     const timestamp = new Date();
 
@@ -13,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(500).json({ error });
       } else {
         const data = this;
-        res.status(200).json({ data });
+        res.status(200).json(data);
       }
     });
   } catch (error) {

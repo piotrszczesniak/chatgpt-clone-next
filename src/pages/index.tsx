@@ -30,25 +30,28 @@ export default function Home() {
   const [inputValue, setInputValue] = useState<string>('');
 
   // not sure if messages are necessary - i guess no
+
   const [messages, setMessages] = useState<SingleMessageType[] | []>([]);
-  const [chat, setChat] = useState<SingleChatType | null>(null);
-  const [history, setHistory] = useState<[]>([]);
+  const [chatHistory, setChatHistory] = useState<[]>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // input changes
-  const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
+  function handleValueChange(e: ChangeEvent<HTMLInputElement>) {
     setInputValue(e.target.value);
-  };
+  }
 
   // request to /api/generate/
-  const handleSendMessages = (e: FormEvent<HTMLFormElement>) => {
+  function handleSendMessages(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessages([...messages, { role: 'user', content: inputValue }]);
     sendMessages();
-  };
+  }
 
-  const sendMessages = async () => {
+  async function sendMessages() {
+    if (currentChatId === null) {
+      startNewChat();
+    }
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -62,25 +65,21 @@ export default function Home() {
     try {
       const response = await fetch(`http://localhost:3000/api/generate`, requestOptions);
       const data = await response.json();
-      // console.log(data);
       setMessages((currentMessages) => [...currentMessages, data.choices[0].message]);
-
       setInputValue('');
     } catch (error) {
       console.error(error);
     }
-  };
+  }
 
-  const handleNewChat = () => {
-    setChat({ id: null, conversation: [] });
+  function handleNewChat() {
     setCurrentChatId(null);
+    setMessages([]);
     inputRef?.current?.focus();
-
-    // startNewChat();
-  };
+  }
 
   // request to /api/new-chat
-  const startNewChat = async () => {
+  async function startNewChat() {
     const requestOptions = {
       method: 'GET',
       headers: {
@@ -91,19 +90,24 @@ export default function Home() {
     try {
       const response = await fetch('http://localhost:3000/api/new-chat', requestOptions);
       const data = await response.json();
-      setChat({ id: data.lastID, conversation: [] });
       setCurrentChatId(data.lastID);
+      setMessages((prevMessages) => [...prevMessages]);
       getChatHistory();
     } catch (error: unknown) {
       console.error(error);
     }
-  };
+  }
 
-  const handleDeleteSingleChat = (id: number) => {
+  function handleTest() {
+    console.log('testing...');
+    startNewChat();
+  }
+
+  function handleDeleteSingleChat(id: number) {
     deleteSingleChat(id);
-  };
+  }
 
-  const deleteSingleChat = async (id: number) => {
+  async function deleteSingleChat(id: number) {
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -119,15 +123,15 @@ export default function Home() {
     } catch (error: unknown) {
       console.error(error);
     }
-  };
+  }
 
   // request to /api/chat
-  const handleShowSingleChat = (id: number) => {
+  function handleShowSingleChat(id: number) {
     setCurrentChatId(id);
     getSingleChat(id);
-  };
+  }
 
-  const getSingleChat = async (id: number) => {
+  async function getSingleChat(id: number) {
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -144,13 +148,13 @@ export default function Home() {
         { role: 'assistant', content: item?.answer },
       ]);
 
-      setChat({ id, conversation: mappedData.flat() });
+      setMessages(mappedData.flat());
     } catch (error: unknown) {
       console.error(error);
     }
-  };
+  }
 
-  const getChatHistory = async () => {
+  async function getChatHistory() {
     const requestOptions = {
       method: 'GET',
       headers: {
@@ -161,23 +165,13 @@ export default function Home() {
     try {
       const response = await fetch('http://localhost:3000/api/history', requestOptions);
       const data = await response.json();
-      setHistory(data);
+      setChatHistory(data.reverse());
     } catch (error: unknown) {
       console.error(error);
     }
-  };
+  }
 
   // ! Console Logs
-
-  // when messages gets updated, also chat gets updated
-  useEffect(() => {
-    setChat((prevChat) => {
-      if (prevChat) {
-        return { id: prevChat.id, conversation: messages };
-      }
-      return null;
-    });
-  }, [messages]);
 
   useEffect(() => {
     getChatHistory();
@@ -192,7 +186,6 @@ export default function Home() {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-
       <Box sx={{ flexGrow: 1, height: '100vh' }}>
         <Grid container sx={{ height: '100%' }}>
           <Grid
@@ -218,12 +211,12 @@ export default function Home() {
               new chat
             </Button>
 
-            {history.length === 0 ? (
+            {chatHistory.length === 0 ? (
               <div>
                 <p>No previouse chats</p>
               </div>
             ) : (
-              history.map((item: { id: number; date: string }, index: number) => {
+              chatHistory.map((item: { id: number; date: string }, index: number) => {
                 const date = new Date(item.date);
                 return (
                   <Button
@@ -290,8 +283,7 @@ export default function Home() {
               style={{}}
             >
               <Box className='messages' sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {/* conversation should be displayed */}
-                {chat?.conversation?.map((message, index) => {
+                {messages?.map((message, index) => {
                   return <Message message={message} key={index} />;
                 })}
               </Box>

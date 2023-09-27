@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const body = {
       model: 'gpt-3.5-turbo',
       messages: [...req.body.messages],
-      max_tokens: 100,
+      max_tokens: 50,
       format: 'markdown',
     };
 

@@ -13,21 +13,16 @@ import db from '@/utilis/db';
 
 type ResponseData = {};
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  console.log('history endpoint gets hit');
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const sql = `SELECT * FROM chatgpt_chats`;
 
   try {
     db.all(sql, [], (error: Error | null, rows: unknown) => {
       if (error) {
-        console.error(error.message);
+        // console.error(error.message);
         res.status(500).json({ error: 'Internal Server Error' });
       } else {
         const data = rows;
-        console.log(data);
         res.status(200).json(data);
       }
     });
