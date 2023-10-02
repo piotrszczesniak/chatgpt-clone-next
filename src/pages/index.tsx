@@ -101,11 +101,7 @@ export default function Home() {
     startNewChat();
   }
 
-  function handleDeleteSingleChat(id: number) {
-    deleteSingleChat(id);
-  }
-
-  async function deleteSingleChat(id: number) {
+  async function handleDeleteSingleChat(id: number) {
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -141,6 +137,7 @@ export default function Home() {
       const response = await fetch('http://localhost:3000/api/chat', requestOptions);
       const data = await response.json();
       console.table(data);
+
       const mappedData = data.map((item: any /* temporaty type */) => [
         { role: 'user', content: item?.question },
         { role: 'assistant', content: item?.answer },
@@ -228,7 +225,7 @@ export default function Home() {
                 return (
                   <Button
                     data-chat-id={item?.id}
-                    disabled={item.id === currentChatId ? true : false}
+                    disabled={item.id === currentChatId}
                     key={index}
                     sx={{
                       marginBottom: '0.5rem',
@@ -287,7 +284,6 @@ export default function Home() {
                   borderRadius: '6px',
                 },
               }}
-              style={{}}
             >
               <Box className='messages' sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {messages?.map((message, index) => {
@@ -313,6 +309,7 @@ export default function Home() {
                   }}
                 >
                   <TextField
+                    // autoFocus={true} /* MUI read about it */
                     value={inputValue}
                     placeholder='Type a new message'
                     onChange={handleValueChange}
