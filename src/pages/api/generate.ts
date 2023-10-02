@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import db from '@/utilis/db';
+import { RunResult } from 'sqlite3';
 
 let sql;
 
@@ -23,14 +24,9 @@ let sql;
 type ResponseData = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // if (req.body.id !== null) {
-  // logic to call db, create new chat id and return it
-  console.log('---- id ', req.body.id);
-  // const data = { id: 1 };
-  // res.status(200).json(data);
-  // make db call to get chat IT
-  // } else {
-  // make API call to /chat/completions
+  const chatId = req.body.id;
+  const question = req.body.lastMessage.question;
+  let answer;
 
   const body = {
     model: 'gpt-3.5-turbo',
@@ -39,20 +35,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     format: 'markdown',
   };
 
-  const requestOptions: RequestInit = {
+  const chatRequestOptions: RequestInit = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
-
     body: JSON.stringify(body),
   };
 
   try {
-    const response = await fetch(`https://api.openai.com/v1/chat/completions`, requestOptions);
-    const data = await response.json();
-    res.status(200).json(data);
+    const chatResponse = await fetch(`https://api.openai.com/v1/chat/completions`, chatRequestOptions);
+    const chatData = await chatResponse.json();
+    answer = chatData.choices[0].message.content;
+
+    const chatMessageValues = {
+      id_chat: chatId,
+      question,
+      answer,
+    };
+
+    console.log('chat data --------', chatData);
+
+    const sql = `INSERT INTO chatgpt_messages(id_chat, question, answer) VALUES (?,?,?)`;
+
+    db.run(
+      sql,
+      [chatMessageValues.id_chat, chatMessageValues.question, chatMessageValues.answer],
+      function (this: RunResult, error: Error | null) {
+        if (error) {
+          res.status(500).json({ error });
+        } else {
+          const dbData = this;
+          console.log('db data --------', dbData);
+
+          res.status(200).json({ dbData, chatData });
+        }
+      }
+    );
+
+    // res.status(200).json(chatData);
   } catch (error) {
     res.status(400).json({ error });
   }

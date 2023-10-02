@@ -32,6 +32,22 @@ export default function Home() {
   const [chatHistory, setChatHistory] = useState<[]>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [lastMessage, setLastMessage] = useState({
+    question: '',
+    answer: '',
+  });
+
+  /**
+   * @task -> save last question and answer to db
+   * //- save last question in state in FE
+   * //- send it to BE
+   * //- send it to chatgpt
+   * //- get answer from chatgpt
+   * - get chat_id from database //! how to wait for it before making a call to db?
+   * - send question and answer to db
+   * - send question and answer to BE
+   * - send question and answer to FR
+   */
 
   // input changes
   function handleValueChange(e: ChangeEvent<HTMLInputElement>) {
@@ -39,8 +55,9 @@ export default function Home() {
   }
 
   // request to /api/generate/
-  function handleSendMessages(e: FormEvent<HTMLFormElement>) {
+  function handleFormSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLastMessage({ question: inputValue, answer: '' });
     setMessages([...messages, { role: 'user', content: inputValue }]);
     sendMessages();
   }
@@ -56,6 +73,7 @@ export default function Home() {
       },
       body: JSON.stringify({
         id: currentChatId,
+        lastMessage: { question: inputValue, answer: '' },
         messages: [...messages, { role: 'user', content: inputValue }],
       }),
     };
@@ -63,8 +81,9 @@ export default function Home() {
     try {
       const response = await fetch(`http://localhost:3000/api/generate`, requestOptions);
       const data = await response.json();
-      setMessages((currentMessages) => [...currentMessages, data.choices[0].message]);
-      setInputValue('');
+      console.log(data);
+      // setMessages((currentMessages) => [...currentMessages, data.choices[0].message]);
+      // setInputValue('');
     } catch (error) {
       console.error(error);
     }
@@ -167,7 +186,7 @@ export default function Home() {
   }
 
   // ! Console Logs
-  console.log(currentChatId);
+  console.log(lastMessage);
 
   // ! only new messages should be save in data base
 
@@ -299,7 +318,7 @@ export default function Home() {
             >
               <Box>
                 <form
-                  onSubmit={handleSendMessages}
+                  onSubmit={handleFormSubmit}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
