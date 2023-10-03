@@ -63,9 +63,9 @@ export default function Home() {
   }
 
   async function sendMessages() {
-    if (currentChatId === null) {
-      startNewChat();
-    }
+    // if (currentChatId === null) {
+    //   startNewChat();
+    // }
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -81,17 +81,20 @@ export default function Home() {
     try {
       const response = await fetch(`http://localhost:3000/api/generate`, requestOptions);
       const data = await response.json();
-      console.log(data);
-      // setMessages((currentMessages) => [...currentMessages, data.choices[0].message]);
-      // setInputValue('');
+      console.log(data.chatData.choices[0].message);
+      setMessages((currentMessages) => [...currentMessages, data.chatData.choices[0].message]);
+      setInputValue('');
     } catch (error) {
       console.error(error);
     }
   }
 
   function handleNewChat() {
-    setCurrentChatId(null);
-    setMessages([]);
+    if (messages.length !== 0 && currentChatId !== null) {
+      setCurrentChatId(null);
+      startNewChat();
+      setMessages([]);
+    }
     inputRef?.current?.focus();
   }
 
@@ -113,11 +116,6 @@ export default function Home() {
     } catch (error: unknown) {
       console.error(error);
     }
-  }
-
-  function handleTest() {
-    console.log('testing...');
-    startNewChat();
   }
 
   async function handleDeleteSingleChat(id: number) {
@@ -155,7 +153,6 @@ export default function Home() {
     try {
       const response = await fetch('http://localhost:3000/api/chat', requestOptions);
       const data = await response.json();
-      console.table(data);
 
       const mappedData = data.map((item: any /* temporaty type */) => [
         { role: 'user', content: item?.question },
@@ -186,15 +183,6 @@ export default function Home() {
   }
 
   // ! Console Logs
-  console.log(lastMessage);
-
-  // ! only new messages should be save in data base
-
-  useEffect(() => {
-    if (currentChatId && messages) {
-      console.log('it is time to save data in db');
-    }
-  }, [messages, currentChatId]);
 
   useEffect(() => {
     getChatHistory();
