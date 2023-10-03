@@ -11,3 +11,8 @@ export type SingleChatType = {
 export type HistoryType = {
   records: SingleChatType[];
 };
+
+export type LastMessageType = {
+  question: string;
+  answer: string;
+};

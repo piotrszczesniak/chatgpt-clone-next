@@ -16,19 +16,19 @@ const Message = ({ message }: MessageProps) => {
         display: 'flex',
         gap: '0.5rem',
 
-        justifyContent: message.role === 'user' ? 'flex-start' : 'flex-end',
+        justifyContent: message?.role === 'user' ? 'flex-start' : 'flex-end',
       }}
     >
       <Image
-        src={message.role === 'user' ? '/user.webp' : '/assistant.svg'}
+        src={message?.role === 'user' ? '/user.webp' : '/assistant.svg'}
         alt={''}
         width={32}
         height={32}
         style={{
-          order: message.role === 'user' ? '0' : '1',
+          order: message?.role === 'user' ? '0' : '1',
           color: 'white',
           borderRadius: '50%',
-          backgroundColor: message.role === 'user' ? 'white' : 'white',
+          backgroundColor: message?.role === 'user' ? 'white' : 'white',
         }}
       />
       <Paper
@@ -39,7 +39,7 @@ const Message = ({ message }: MessageProps) => {
           boxShadow: '0 0 10px 5px #444c56',
         }}
       >
-        <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>{message.content || ''}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>{message?.content || ''}</ReactMarkdown>
       </Paper>
     </Box>
   );

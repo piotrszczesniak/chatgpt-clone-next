@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import db from '@/utilis/db';
 import { RunResult } from 'sqlite3';
 
+db.run('PRAGMA foreign_keys = ON;');
+
 const sql = `INSERT INTO chatgpt_chats(date) VALUES (?)`;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

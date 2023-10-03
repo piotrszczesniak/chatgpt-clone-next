@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import db from '@/utilis/db';
 
+db.run('PRAGMA foreign_keys = ON;');
+
 type ResponseData = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

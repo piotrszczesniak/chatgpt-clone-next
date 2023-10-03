@@ -11,7 +11,7 @@ import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import { Box, Container, Grid, Paper, TextField, styled } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Message from '@/components/Message';
-import { SingleChatType, HistoryType, SingleMessageType } from '@/utilis/types';
+import { SingleChatType, HistoryType, SingleMessageType, LastMessageType } from '@/utilis/types';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,7 +32,7 @@ export default function Home() {
   const [chatHistory, setChatHistory] = useState<[]>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [lastMessage, setLastMessage] = useState({
+  const [lastMessage, setLastMessage] = useState<LastMessageType | null>({
     question: '',
     answer: '',
   });
@@ -57,15 +57,17 @@ export default function Home() {
   // request to /api/generate/
   function handleFormSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (messages.length === 0 && !currentChatId) {
+      handleNewChat();
+    }
+
     setLastMessage({ question: inputValue, answer: '' });
     setMessages([...messages, { role: 'user', content: inputValue }]);
     sendMessages();
   }
 
   async function sendMessages() {
-    // if (currentChatId === null) {
-    //   startNewChat();
-    // }
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -81,8 +83,8 @@ export default function Home() {
     try {
       const response = await fetch(`http://localhost:3000/api/generate`, requestOptions);
       const data = await response.json();
-      console.log(data.chatData.choices[0].message);
-      setMessages((currentMessages) => [...currentMessages, data.chatData.choices[0].message]);
+
+      setMessages((currentMessages) => [...currentMessages, data?.chatData?.choices[0]?.message]);
       setInputValue('');
     } catch (error) {
       console.error(error);
@@ -90,11 +92,13 @@ export default function Home() {
   }
 
   function handleNewChat() {
-    if (messages.length !== 0 && currentChatId !== null) {
-      setCurrentChatId(null);
-      startNewChat();
-      setMessages([]);
+    if (messages.length === 0 && currentChatId !== null) {
+      alert('Please add content to the current chat before starting a new one.');
+      return;
     }
+    setCurrentChatId(null);
+    setMessages([]);
+    startNewChat();
     inputRef?.current?.focus();
   }
 
@@ -130,6 +134,9 @@ export default function Home() {
     try {
       const response = await fetch(`http://localhost:3000/api/delete-chat`, requestOptions);
       const data = await response.json();
+      setCurrentChatId(null);
+      setMessages([]);
+      setLastMessage(null);
       getChatHistory();
     } catch (error: unknown) {
       console.error(error);
@@ -183,6 +190,10 @@ export default function Home() {
   }
 
   // ! Console Logs
+  console.log('currentChatId', currentChatId);
+  console.log('messages lenght', messages.length);
+  console.log('lastMessage', lastMessage);
+  console.log('chatHistory', chatHistory);
 
   useEffect(() => {
     getChatHistory();
@@ -227,14 +238,15 @@ export default function Home() {
                 <p>No previouse chats</p>
               </div>
             ) : (
-              chatHistory.map((item: { id: number; date: string }, index: number) => {
+              chatHistory?.map((item: { id: number; date: string }, index: number) => {
                 const date = new Date(item.date);
                 return (
                   <Button
                     data-chat-id={item?.id}
-                    disabled={item.id === currentChatId}
+                    // disabled={item.id === currentChatId}
                     key={index}
                     sx={{
+                      boxShadow: item.id === currentChatId ? '0 0 10px 1px grey' : '',
                       marginBottom: '0.5rem',
                       position: 'relative',
                     }}
@@ -247,17 +259,19 @@ export default function Home() {
                     // endIcon={}
                   >
                     Chat from {date.toLocaleDateString()}
-                    <DeleteOutlineIcon
-                      onClick={(e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-                        e.stopPropagation();
-                        handleDeleteSingleChat(item?.id);
-                      }}
-                      sx={{
-                        position: 'absolute',
-                        right: '8px',
-                        zIndex: 1,
-                      }}
-                    />
+                    {currentChatId === item.id && (
+                      <DeleteOutlineIcon
+                        onClick={(e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+                          e.stopPropagation();
+                          handleDeleteSingleChat(item?.id);
+                        }}
+                        sx={{
+                          position: 'absolute',
+                          right: '8px',
+                          zIndex: 1,
+                        }}
+                      />
+                    )}
                   </Button>
                 );
               })

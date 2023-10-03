@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import db from '@/utilis/db';
 import { RunResult } from 'sqlite3';
 
-let sql;
+db.run('PRAGMA foreign_keys = ON;');
 
 // sql = `INSERT INTO chatgpt_messages(date, question, answer,id_chat) VALUES (?,?,?,?)`;
 

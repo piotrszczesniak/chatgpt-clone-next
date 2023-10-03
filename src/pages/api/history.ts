@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import db from '@/utilis/db';
 
+db.run('PRAGMA foreign_keys = ON;');
+
 // db.run('DROP TABLE chatgpt_messages');
 // db.run('TRUNCATE TABLE chatgpt_messages');
 
@@ -19,8 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     db.all(sql, [], (error: Error | null, rows: unknown) => {
       if (error) {
-        // console.error(error.message);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error });
       } else {
         const data = rows;
         res.status(200).json(data);
