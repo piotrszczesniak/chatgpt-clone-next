@@ -55,8 +55,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       answer,
     };
 
-    console.log('chat data --------', chatData);
-
     const sql = `INSERT INTO chatgpt_messages(id_chat, question, answer) VALUES (?,?,?)`;
 
     db.run(
@@ -67,16 +65,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           res.status(500).json({ error });
         } else {
           const dbData = this;
-          console.log('db data --------', dbData);
-
           res.status(200).json({ dbData, chatData });
         }
       }
     );
-
-    // res.status(200).json(chatData);
   } catch (error) {
     res.status(400).json({ error });
   }
 }
-// }

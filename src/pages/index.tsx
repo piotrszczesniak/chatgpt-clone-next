@@ -43,10 +43,10 @@ export default function Home() {
    * //- send it to BE
    * //- send it to chatgpt
    * //- get answer from chatgpt
-   * - get chat_id from database //! how to wait for it before making a call to db?
-   * - send question and answer to db
-   * - send question and answer to BE
-   * - send question and answer to FR
+   * //- get chat_id from database //! how to wait for it before making a call to db?
+   * //- send question and answer to db
+   * //- send question and answer to BE
+   * //- send question and answer to FR
    */
 
   // input changes
@@ -55,26 +55,30 @@ export default function Home() {
   }
 
   // request to /api/generate/
-  function handleFormSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleFormSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
+    let id = currentChatId;
     if (messages.length === 0 && !currentChatId) {
-      handleNewChat();
+      id = await startNewChat();
     }
 
     setLastMessage({ question: inputValue, answer: '' });
     setMessages([...messages, { role: 'user', content: inputValue }]);
-    sendMessages();
+
+    if (id) {
+      sendMessagesForChat(id);
+    }
   }
 
-  async function sendMessages() {
+  async function sendMessagesForChat(id: number) {
     const requestOptions = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: currentChatId,
+        id,
         lastMessage: { question: inputValue, answer: '' },
         messages: [...messages, { role: 'user', content: inputValue }],
       }),
@@ -115,10 +119,11 @@ export default function Home() {
       const response = await fetch('http://localhost:3000/api/new-chat', requestOptions);
       const data = await response.json();
       setCurrentChatId(data.lastID);
-      setMessages((prevMessages) => [...prevMessages]);
       getChatHistory();
+      return data.lastID;
     } catch (error: unknown) {
       console.error(error);
+      // return false;
     }
   }
 
