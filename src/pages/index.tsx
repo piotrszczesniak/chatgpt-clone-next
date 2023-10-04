@@ -15,16 +15,15 @@ import { SingleChatType, HistoryType, SingleMessageType, LastMessageType } from 
 
 const inter = Inter({ subsets: ['latin'] });
 
-// https://www.youtube.com/watch?v=uRQH2CFvedY
-
-// PRAGMA foreign_keys = ON;
-
-// TODO:
-//  * sqlite3 // npm
-//  * mysql: insert, select (where from), delete
-//  * front <---> backend <---> baza
-//  * https://sqlitebrowser.org/
-//  * sqlite3 orm node
+/**
+ * !TODO:
+ * * https://sqlitebrowser.org/
+ * * sqlite3 orm node
+ * * Chat GPT Course: https://www.youtube.com/watch?v=uRQH2CFvedY
+ * * Node.js SQLite Crash Course: https://www.youtube.com/watch?v=ZRYn6tgnEgM
+ * * Flow diagram https://jamboard.google.com/d/1AId5pe99cJ6OjPzvyLe56pHQkcRxW_y6F6tXQoYmNlU/edit?usp=sharing
+ * ? SQL injections
+ */
 
 export default function Home() {
   const [inputValue, setInputValue] = useState<string>('');
@@ -36,18 +35,6 @@ export default function Home() {
     question: '',
     answer: '',
   });
-
-  /**
-   * @task -> save last question and answer to db
-   * //- save last question in state in FE
-   * //- send it to BE
-   * //- send it to chatgpt
-   * //- get answer from chatgpt
-   * //- get chat_id from database //! how to wait for it before making a call to db?
-   * //- send question and answer to db
-   * //- send question and answer to BE
-   * //- send question and answer to FR
-   */
 
   // input changes
   function handleValueChange(e: ChangeEvent<HTMLInputElement>) {
@@ -71,6 +58,7 @@ export default function Home() {
     }
   }
 
+  // function that talks to the open ai api and sends data to db
   async function sendMessagesForChat(id: number) {
     const requestOptions = {
       method: 'POST',
@@ -89,15 +77,17 @@ export default function Home() {
       const data = await response.json();
 
       setMessages((currentMessages) => [...currentMessages, data?.chatData?.choices[0]?.message]);
+
       setInputValue('');
     } catch (error) {
       console.error(error);
     }
   }
 
+  // funtion that handles adding new chat
   function handleNewChat() {
     if (messages.length === 0 && currentChatId !== null) {
-      alert('Please add content to the current chat before starting a new one.');
+      inputRef.current?.focus();
       return;
     }
     setCurrentChatId(null);
@@ -123,10 +113,10 @@ export default function Home() {
       return data.lastID;
     } catch (error: unknown) {
       console.error(error);
-      // return false;
     }
   }
 
+  // function that removes selected chat with messages
   async function handleDeleteSingleChat(id: number) {
     const requestOptions = {
       method: 'POST',
@@ -148,12 +138,13 @@ export default function Home() {
     }
   }
 
-  // request to /api/chat
+  // function that handles showing single chat
   function handleShowSingleChat(id: number) {
     setCurrentChatId(id);
     getSingleChat(id);
   }
 
+  // request to /api/chat
   async function getSingleChat(id: number) {
     const requestOptions = {
       method: 'POST',
@@ -177,6 +168,7 @@ export default function Home() {
     }
   }
 
+  // request to /api/history
   async function getChatHistory() {
     const requestOptions = {
       method: 'GET',
@@ -194,13 +186,8 @@ export default function Home() {
     }
   }
 
-  // ! Console Logs
-  console.log('currentChatId', currentChatId);
-  console.log('messages lenght', messages.length);
-  console.log('lastMessage', lastMessage);
-  console.log('chatHistory', chatHistory);
-
   useEffect(() => {
+    // show history on inital render
     getChatHistory();
     inputRef?.current?.focus();
   }, []);
@@ -248,12 +235,14 @@ export default function Home() {
                 return (
                   <Button
                     data-chat-id={item?.id}
-                    // disabled={item.id === currentChatId}
                     key={index}
                     sx={{
                       boxShadow: item.id === currentChatId ? '0 0 10px 1px grey' : '',
                       marginBottom: '0.5rem',
                       position: 'relative',
+                      justifyContent: 'flex-start',
+                      overflow: 'hidden',
+                      maxHeight: '36.5px',
                     }}
                     onClick={() => handleShowSingleChat(item?.id)}
                     className={styles.button}
@@ -261,9 +250,18 @@ export default function Home() {
                     fullWidth
                     variant='outlined'
                     startIcon={<ChatIcon />}
-                    // endIcon={}
                   >
-                    Chat from {date.toLocaleDateString()}
+                    <p
+                      style={{
+                        lineHeight: '1.5rem',
+                        height: '1.5rem',
+                        overflow: 'hidden',
+                        textAlign: 'left',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      Chat from {date.toLocaleDateString()}
+                    </p>
                     {currentChatId === item.id && (
                       <DeleteOutlineIcon
                         onClick={(e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
@@ -272,8 +270,9 @@ export default function Home() {
                         }}
                         sx={{
                           position: 'absolute',
-                          right: '8px',
+                          right: '0',
                           zIndex: 1,
+                          backgroundColor: '#444c56',
                         }}
                       />
                     )}

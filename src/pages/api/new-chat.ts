@@ -7,7 +7,6 @@ db.run('PRAGMA foreign_keys = ON;');
 const sql = `INSERT INTO chatgpt_chats(date) VALUES (?)`;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log('new chat endpoint gets hit');
   try {
     const timestamp = new Date();
 

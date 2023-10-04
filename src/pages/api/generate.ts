@@ -5,22 +5,6 @@ import { RunResult } from 'sqlite3';
 
 db.run('PRAGMA foreign_keys = ON;');
 
-// sql = `INSERT INTO chatgpt_messages(date, question, answer,id_chat) VALUES (?,?,?,?)`;
-
-// db.run('DROP TABLE chatgpt_messages');
-// db.run('TRUNCATE TABLE chatgpt_messages');
-
-// const foo = db.run
-// sgl injection
-
-// db.run(sql, ['today', 'How are you?', 'I am fine.', 2], (error: Error | null) => {
-//   if (error) return console.error(error.message);
-// });
-
-// https://www.youtube.com/watch?v=ZRYn6tgnEgM
-
-//! Flow diagram https://jamboard.google.com/d/1AId5pe99cJ6OjPzvyLe56pHQkcRxW_y6F6tXQoYmNlU/edit?usp=sharing
-
 type ResponseData = {};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,9 +13,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   let answer;
 
   const body = {
-    model: 'gpt-3.5-turbo',
+    model: 'gpt-4',
     messages: [...req.body.messages],
-    max_tokens: 50,
+    max_tokens: 200,
     format: 'markdown',
   };
 
