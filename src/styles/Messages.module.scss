@@ -1,11 +1,25 @@
 .content {
+  ol {
+    margin-left: 1rem;
+    font-weight: 500;
+  }
+
   pre {
-    background-color: #1b1b1b;
+    background: #282c34;
     overflow: auto;
     font-family: 'Monaco', monospace;
-    padding: 15px 20px 12px 22px;
+    padding: 1rem 0.5rem;
     border-radius: 0.25rem;
-    color: #f5d67b;
+    color: yellow;
     margin: 1rem 0;
+    line-height: 150%;
+    overflow: auto;
+  }
+
+  code {
+    background: #282c34;
+    color: yellow;
+    padding: 0.5rem;
+    border-radius: 4px;
   }
 }
