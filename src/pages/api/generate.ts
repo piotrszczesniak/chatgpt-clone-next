@@ -7,7 +7,10 @@ db.run('PRAGMA foreign_keys = ON;');
 
 type ResponseData = {};
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   const chatId = req.body.id;
   const question = req.body.lastMessage.question;
   let answer;
@@ -15,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const body = {
     model: 'gpt-4',
     messages: [...req.body.messages],
-    max_tokens: 200,
+    max_tokens: 500,
     format: 'markdown',
   };
 
@@ -29,7 +32,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   };
 
   try {
-    const chatResponse = await fetch(`https://api.openai.com/v1/chat/completions`, chatRequestOptions);
+    const chatResponse = await fetch(
+      `https://api.openai.com/v1/chat/completions`,
+      chatRequestOptions
+    );
     const chatData = await chatResponse.json();
     answer = chatData.choices[0].message.content;
 
@@ -43,7 +49,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     db.run(
       sql,
-      [chatMessageValues.id_chat, chatMessageValues.question, chatMessageValues.answer],
+      [
+        chatMessageValues.id_chat,
+        chatMessageValues.question,
+        chatMessageValues.answer,
+      ],
       function (this: RunResult, error: Error | null) {
         if (error) {
           res.status(500).json({ error });

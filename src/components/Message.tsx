@@ -3,6 +3,7 @@ import { Box, Paper } from '@mui/material';
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import styles from '@/styles/Messages.module.scss';
 
 type MessageProps = {
   message: SingleMessageType;
@@ -11,7 +12,7 @@ type MessageProps = {
 const Message = ({ message }: MessageProps) => {
   return (
     <Box
-      className='message'
+      className="message"
       sx={{
         display: 'flex',
         gap: '0.5rem',
@@ -39,7 +40,12 @@ const Message = ({ message }: MessageProps) => {
           boxShadow: '0 0 10px 5px #444c56',
         }}
       >
-        <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>{message?.content || ''}</ReactMarkdown>
+        <ReactMarkdown
+          className={styles.content}
+          remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
+        >
+          {message?.content || ''}
+        </ReactMarkdown>
       </Paper>
     </Box>
   );
