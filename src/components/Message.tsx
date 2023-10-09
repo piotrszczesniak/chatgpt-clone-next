@@ -12,7 +12,7 @@ type MessageProps = {
 const Message = ({ message }: MessageProps) => {
   return (
     <Box
-      className="message"
+      className='message'
       sx={{
         display: 'flex',
         gap: '0.5rem',
@@ -40,10 +40,7 @@ const Message = ({ message }: MessageProps) => {
           boxShadow: '0 0 10px 5px #444c56',
         }}
       >
-        <ReactMarkdown
-          className={styles.content}
-          remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
-        >
+        <ReactMarkdown className={styles.content} remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>
           {message?.content || ''}
         </ReactMarkdown>
       </Paper>
